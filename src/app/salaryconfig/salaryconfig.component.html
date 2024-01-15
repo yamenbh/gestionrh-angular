@@ -1,0 +1,218 @@
+<div class="main-wrapper">
+  <app-sidebar></app-sidebar>
+  <app-navbar></app-navbar>
+  <div class="page-wrapper">
+    <!-- Page Content -->
+    <div class="content container-fluid">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col">
+            <h3 class="page-title">Configuration du salaire</h3>
+            <ul class="breadcrumb">
+              <li class="breadcrumb-item"><a href="/Mainindex">Tableau de bord</a></li>
+              <li class="breadcrumb-item active">Configuration du salaire</li>
+            </ul>
+          </div>
+            <div class="col-auto float-right ml-auto">
+              <a href="?" class="btn add-btn" data-toggle="modal" data-target="#add_salaryconfig">
+                <i class="fa fa-plus"></i> Ajouter configuration de salaire
+              </a>
+            </div>
+        </div>
+      </div>
+      <!-- /Page Header -->
+      <div class="row">
+        <div class="col-md-8 offset-md-2">
+          <div *ngFor="let salaireconfig of salairesconfig">
+            <!-- DA and HRA Settings -->
+            <div class="settings-widget">
+              <div class="h3 card-title with-switch">PA and CCNSS</div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>Prime Anciennete (%)</label>
+                    <input type="text" class="form-control" disabled [value]="salaireconfig.primeAnciennetepourcentage" />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>Costisation CNSS (%)</label>
+                    <input class="form-control" type="text" disabled [value]="salaireconfig.cotisationCNSSpourcentage" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- /DA and HRA Settings -->
+            <!-- Provident Fund Settings -->
+            <div class="settings-widget">
+              <div class="h3 card-title with-switch">IPE and CAMO</div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>Indemnite Perte Emploi (%)</label>
+                    <input class="form-control" type="text" disabled [value]="salaireconfig.indemnitePerteEmploipourcentage" />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>Cotisation AMO (%)</label>
+                    <input class="form-control" type="text" disabled [value]="salaireconfig.cotisationAMOpourcentage" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- /Provident Fund Settings -->
+            <!-- ESI Settings -->
+            <div class="settings-widget">
+              <div class="h3 card-title with-switch">AMM and CCIMR</div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>Assurance Maladie Mutuelle (%)</label>
+                    <input class="form-control" type="text" disabled [value]="salaireconfig.assuranceMaladieMutuellepourcentage" />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>Cotisation CIMR (%)</label>
+                    <input class="form-control" type="text" disabled [value]="salaireconfig.cotisationCIMRpourcentage" />
+                  </div>
+                </div>
+              </div>
+            </div>
+              <div class="submit-section">
+                <button class="btn btn-primary submit-btn" data-toggle="modal" data-target="#edit_settings" (click)="handleEditSalaireconfig(salaireconfig)">Modifier</button>
+              </div>
+            <!-- /ESI Settings -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Page Content -->
+
+    <!-- Add Parametre Modal -->
+    <div class="modal custom-modal fade" [ngClass]="{'show': showAddModal}" id="add_salaryconfig" role="dialog">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Ajouter configuration de salaire</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form (submit)="handleSubmit()">
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>Prime Anciennete<span class="text-danger">*</span></label>
+                    <input class="form-control" type="text" name="primeAnciennetepourcentage" [(ngModel)]="formData.primeAnciennetepourcentage" />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>Cotisation CNSS</label>
+                    <input class="form-control" type="text" name="cotisationCNSSpourcentage" [(ngModel)]="formData.cotisationCNSSpourcentage" />
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>Indemnite PerteEmploi</label>
+                    <input class="form-control" type="text" name="indemnitePerteEmploipourcentage" [(ngModel)]="formData.indemnitePerteEmploipourcentage" />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>Cotisation AMO</label>
+                    <input class="form-control" type="text" name="cotisationAMOpourcentage" [(ngModel)]="formData.cotisationAMOpourcentage" />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>Assurance Maladie Mutuelle</label>
+                    <input class="form-control" type="text" name="assuranceMaladieMutuellepourcentage" [(ngModel)]="formData.assuranceMaladieMutuellepourcentage" />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>Cotisation CIMR</label>
+                    <input class="form-control" type="text" name="cotisationCIMRpourcentage" [(ngModel)]="formData.cotisationCIMRpourcentage" />
+                  </div>
+                </div>
+              </div>
+              <div class="submit-section">
+                <button class="btn btn-primary submit-btn" type="submit">Sauvegarder</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Add Parametre Modal -->
+
+    <!-- Edit Parametre Modal -->
+    <div class="modal custom-modal fade" *ngIf="selectedSalaireConfig && showEditModal" id="edit_settings" role="dialog">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Modifier configuration du salaire</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form (submit)="handleUpdateSalaireConfig()">
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>Prime Anciennete<span class="text-danger">*</span></label>
+                    <input class="form-control" type="text" name="primeAnciennetepourcentage" [(ngModel)]="formData.primeAnciennetepourcentage" />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>Cotisation CNSS</label>
+                    <input class="form-control" type="text" name="cotisationCNSSpourcentage" [(ngModel)]="formData.cotisationCNSSpourcentage" />
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>Indemnite PerteEmploi</label>
+                    <input class="form-control" type="text" name="indemnitePerteEmploipourcentage" [(ngModel)]="formData.indemnitePerteEmploipourcentage" />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>Cotisation AMO</label>
+                    <input class="form-control" type="text" name="cotisationAMOpourcentage" [(ngModel)]="formData.cotisationAMOpourcentage" />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>Assurance Maladie Mutuelle</label>
+                    <input class="form-control" type="text" name="assuranceMaladieMutuellepourcentage" [(ngModel)]="formData.assuranceMaladieMutuellepourcentage" />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>Cotisation CIMR</label>
+                    <input class="form-control" type="text" name="cotisationCIMRpourcentage" [(ngModel)]="formData.cotisationCIMRpourcentage" />
+                  </div>
+                </div>
+              </div>
+              <div class="submit-section">
+                <button class="btn btn-primary submit-btn" type="submit">Save</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Edit Parametre Modal -->
+  </div>
+</div>

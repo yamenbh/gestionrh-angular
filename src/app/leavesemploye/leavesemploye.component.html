@@ -1,0 +1,230 @@
+<div class="main-wrapper">
+  <app-sidebar></app-sidebar>
+  <app-navbar></app-navbar>
+  <div class="page-wrapper">
+    <!-- Page Content -->
+    <div class="content container-fluid">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col">
+            <h3 class="page-title">Congés</h3>
+            <ul class="breadcrumb">
+              <li class="breadcrumb-item"><a href="/dashboard">Tableau de bord</a></li>
+              <li class="breadcrumb-item active">Congés</li>
+            </ul>
+          </div>
+          <div class="col-auto float-right ml-auto">
+            <button class="btn add-btn" data-toggle="modal" data-target="#add_leave"><i class="fa fa-plus"></i> Ajouter Congés</button>
+          </div>
+        </div>
+      </div>
+      <!-- /Page Header -->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="table-responsive">
+            <ng-container *ngIf="conges.length > 0; else noDataTemplate">
+              <table class="table table-striped custom-table mb-0 datatable">
+                <thead>
+                  <tr>
+                    <th>Type de congé</th>
+                    <th>Depuis</th>
+                    <th>À</th>
+                    <th>Nombre de jours</th>
+                    <th>Raison</th>
+                    <th class="text-center">Statut</th>
+                    <th class="text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let conge of conges trackBy: trackByConge" (click)="selectConge(conge)">
+                    <td>{{ conge.type_conge }}</td>
+                    <td>{{ conge.datedebut_conge }}</td>
+                    <td>{{ conge.datefin_conge }}</td>
+                    <td>{{ conge.nbrjour_conge }}</td>
+                    <td>{{ conge.reason_conge }}</td>
+                    <td class="text-center">
+                      <div class="dropdown action-label">
+                        <a class="btn btn-white btn-sm btn-rounded" href="#"  aria-expanded="false">
+                          <i [ngClass]="{'fa-dot-circle-o': true, 'text-success': conge.status_conge === 'Approuvé', 'text-danger': conge.status_conge === 'Rejeté', 'text-purple': !(conge.status_conge === 'Approuvé' || conge.status_conge === 'Rejeté')}"></i> {{ conge.status_conge }}
+                        </a>
+                      </div>
+                    </td>
+                    <td class="text-right">
+                      <div class="dropdown dropdown-action">
+                        <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="material-icons">more_vert</i></a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                          <a class="dropdown-item" href="#" data-toggle="modal" data-target="#edit_leave" (click)="handleEditConge(conge)">
+                            <i class="fa fa-pencil m-r-5"></i> Modifier
+                          </a>
+                          <a class="dropdown-item" href="#" data-toggle="modal" data-target="#delete_approve">
+                            <i class="fa fa-trash-o m-r-5"></i> Supprimer
+                          </a>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </ng-container>
+            <ng-template #noDataTemplate>
+              <p>Aucune donnée disponible</p>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Page Content -->
+    <div class="modal custom-modal fade" [ngClass]="{'show': showAddModal}"  role="dialog" id="add_leave">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Ajouter un congé</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form (submit)="handleSubmit($event)" #addLeaveForm="ngForm">
+              <div class="form-group">
+                <label>Type de congé <span class="text-danger">*</span></label>
+                <select class="form-control" name="type_conge" [(ngModel)]="formData.type_conge" required (change)="handleInputChange($event)">
+                  <option>Sélectionnez le type de congé</option>
+                  <option>Congé occasionnel 12 jours</option>
+                  <option>Congé de maladie</option>
+                  <option>Perte de salaire</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Depuis <span class="text-danger">*</span></label>
+                <div>
+                  <input class="form-control" type="date" name="datedebut_conge" [(ngModel)]="formData.datedebut_conge" required (change)="handleInputChange($event)" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>À <span class="text-danger">*</span></label>
+                <div>
+                  <input class="form-control" type="date" name="datefin_conge" [(ngModel)]="formData.datefin_conge" required (change)="handleInputChange($event)" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Number of days <span class="text-danger">*</span></label>
+                <input class="form-control" type="text" name="nbrjour_conge" [(ngModel)]="formData.nbrjour_conge" required (change)="handleInputChange($event)" />
+              </div>
+              <div class="form-group">
+                <label>Raison du congé <span class="text-danger">*</span></label>
+                <textarea rows="4" class="form-control" name="reason_conge" [(ngModel)]="formData.reason_conge" required (change)="handleInputChange($event)"></textarea>
+              </div>
+              <div class="submit-section">
+                <button class="btn btn-primary submit-btn" type="submit">Soumettre</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Edit Leave Modal -->
+    <div *ngIf="selectedConge && showEditModal" class="modal custom-modal fade" role="dialog" id="edit_leave">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Modifier le congé</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form (submit)="handleUpdateConge($event)">
+              <div class="form-group">
+                <label>Type de congé <span class="text-danger">*</span></label>
+                <select class="form-control" name="type_conge" [(ngModel)]="formData.type_conge" required (change)="handleInputChange($event)">
+                  <option>Sélectionnez le type de congé</option>
+                  <option>Congé occasionnel 12 jours</option>
+                  <option>Congé de maladie</option>
+                  <option>Perte de salaire</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Depuis <span class="text-danger">*</span></label>
+                <div>
+                  <input class="form-control" type="date" name="datedebut_conge" [(ngModel)]="formData.datedebut_conge" required (change)="handleInputChange($event)" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>À <span class="text-danger">*</span></label>
+                <div>
+                  <input class="form-control" type="date" name="datefin_conge" [(ngModel)]="formData.datefin_conge" required (change)="handleInputChange($event)" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Number of days <span class="text-danger">*</span></label>
+                <input class="form-control" type="text" name="nbrjour_conge" [(ngModel)]="formData.nbrjour_conge" required (change)="handleInputChange($event)" />
+              </div>
+              <div class="form-group">
+                <label>Raison du congé <span class="text-danger">*</span></label>
+                <textarea rows="4" class="form-control" name="reason_conge" [(ngModel)]="formData.reason_conge" required (change)="handleInputChange($event)"></textarea>
+              </div>
+              <div class="submit-section">
+                <button class="btn btn-primary submit-btn" type="submit">Soumettre</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Edit Leave Modal -->
+
+    <!-- Approve Leave Modal -->
+    <div class="modal custom-modal fade" id="approve_leave" role="dialog">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div class="form-header">
+              <h3>Congé Approuver</h3>
+              <p>Êtes-vous sûr de vouloir approuver ce congé ?</p>
+            </div>
+            <div class="modal-btn delete-action">
+              <div class="row">
+                <div class="col-6">
+                  <a href="#" class="btn btn-primary continue-btn">Approuver</a>
+                </div>
+                <div class="col-6">
+                  <a href="#" data-dismiss="modal" class="btn btn-primary cancel-btn">Déclin</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Approve Leave Modal -->
+
+    <!-- Delete Leave Modal -->
+    <div [ngClass]="{'show': showDeleteModal}"  class="modal custom-modal fade show" id="delete_approve" role="dialog">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div class="form-header">
+              <h3>Supprimer un congé</h3>
+              <p>Etes-vous sûr de vouloir supprimer ce congé ?</p>
+            </div>
+            <div class="modal-btn delete-action">
+              <div class="row">
+                <div class="col-6">
+                  <a href="congesemployee" class="btn btn-primary continue-btn" (click)="ConfirmDeleteConge()">Supprimer</a>
+                </div>
+                <div class="col-6">
+                  <a href="congesemployee" data-dismiss="modal" class="btn btn-primary cancel-btn" (click)="showDeleteModal=false">Annuler</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Delete Leave Modal -->
+
+  </div>
+</div>

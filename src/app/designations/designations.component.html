@@ -1,0 +1,159 @@
+<div class="main-wrapper">
+  <app-sidebar></app-sidebar>
+  <div class="page-wrapper">
+    <app-navbar></app-navbar>
+
+    <!-- Page Content -->
+    <div class="content container-fluid">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col">
+            <h3 class="page-title">Désignations</h3>
+            <ul class="breadcrumb">
+              <li class="breadcrumb-item"><a href="/dashboard">Tableau de bord</a></li>
+              <li class="breadcrumb-item active">Désignations</li>
+            </ul>
+          </div>
+          <div class="col-auto float-right ml-auto">
+            <a href="#" class="btn add-btn" data-toggle="modal" data-target="#add_designation" (click)="showAddModal = true">
+              <i class="fa fa-plus"></i> Ajouter une désignation
+            </a>
+          </div>
+        </div>
+      </div>
+      <!-- /Page Header -->
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="table-responsive">
+            <ng-container *ngIf="posts.length > 0; else noData">
+              <table class="table table-striped custom-table mb-0 datatable">
+                <thead>
+                  <tr>
+                    <th style="width: 30px">#</th>
+                    <th>Designation</th>
+                    <th>Description</th>
+                    <th class="text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let post of posts; trackBy: trackByPost" (click)="selectPost(post)">
+                    <td>{{ post.id_post }}</td>
+                    <td>{{ post.nom_post }}</td>
+                    <td>{{ post.description_post }}</td>
+                    <td class="text-right">
+                      <div class="dropdown dropdown-action">
+                        <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                          <i class="material-icons">more_vert</i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                          <a class="dropdown-item" href="#" data-toggle="modal" data-target="#edit_designation"
+                             (click)="handleEditPost(post)">
+                            <i class="fa fa-pencil m-r-5"></i> Modifier
+                          </a>
+                          <a class="dropdown-item" href="#" data-toggle="modal" data-target="#delete_designation" (click)="handleDeletePost()">
+                            <i class="fa fa-trash-o m-r-5"></i> Supprimer
+                          </a>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </ng-container>
+            <ng-template #noData>
+              <p>Aucune donnée disponible</p>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Page Content -->
+
+    <!-- Add Designation Modal -->
+    <div class="modal custom-modal fade" [ngClass]="{'show': showAddModal}" id="add_designation"  role="dialog" >
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Ajouter une désignation</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="showAddModal = false">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form (submit)="handleSubmit()">
+              <div class="form-group">
+                <label>Désignation Nom <span class="text-danger">*</span></label>
+                <input class="form-control" type="text" name="nom_post" [(ngModel)]="formData.nom_post" />
+              </div>
+              <div class="form-group">
+                <label>Désignation Description <span class="text-danger"></span></label>
+                <input class="form-control" type="text" name="description_post" [(ngModel)]="formData.description_post" />
+              </div>
+              <div class="submit-section">
+                <button class="btn btn-primary submit-btn">Soumettre</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Add Designation Modal -->
+
+    <!-- Edit Designation Modal -->
+    <div *ngIf="selectedPost && showEditModal" id="edit_designation" class="modal custom-modal fade" role="dialog">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Modifier la désignation</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="showEditModal = false">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form (submit)="handleUpdatePost()">
+              <div class="form-group">
+                <label>Désignation Nom <span class="text-danger">*</span></label>
+                <input class="form-control" type="text" name="nom_post" [(ngModel)]="formData.nom_post" />
+              </div>
+              <div class="form-group">
+                <label>Désignation Description <span class="text-danger"></span></label>
+                <input class="form-control" type="text" name="description_post" [(ngModel)]="formData.description_post" />
+              </div>
+              <div class="submit-section">
+                <button class="btn btn-primary submit-btn">Sauvegarder</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Edit Designation Modal -->
+
+<!-- Delete Designation Modal -->
+<div id="delete_designation" class="modal custom-modal fade" role="dialog" [ngClass]="{'show': showDeleteModal}">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="form-header">
+          <h3>Supprimer la désignation</h3>
+          <p>Etes-vous sûr de vouloir supprimer ?</p>
+        </div>
+        <div class="modal-btn delete-action">
+          <div class="row">
+            <div class="col-6">
+              <a href="/designations" class="btn btn-primary continue-btn" (click)="confirmDeletePost()">Supprimer</a>
+            </div>
+            <div class="col-6">
+              <a href="/designations" data-dismiss="modal" class="btn btn-primary cancel-btn" (click)="showDeleteModal = false">Annuler</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /Delete Designation Modal -->
+  </div>
+</div>

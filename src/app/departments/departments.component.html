@@ -1,0 +1,162 @@
+<!-- departments.component.html -->
+
+<div class="main-wrapper">
+  <app-sidebar></app-sidebar> <!-- Assuming you have an Angular Sidebar component -->
+  <app-navbar></app-navbar> <!-- Assuming you have an Angular Navbar component -->
+
+  <div class="page-wrapper">
+    <div class="content container-fluid">
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col">
+            <h3 class="page-title">Département</h3>
+            <ul class="breadcrumb">
+              <li class="breadcrumb-item">
+                <a routerLink="/dashboard">Tableau de bord</a>
+              </li>
+              <li class="breadcrumb-item active">Département</li>
+            </ul>
+          </div>
+          <div class="col-auto float-right ml-auto">
+            <a href="#" class="btn add-btn" data-toggle="modal" data-target="#add_departement" (click)="showAddModal = true">
+              <i class="fa fa-plus"></i> Ajouter un département
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <div *ngIf="departements.length > 0; else noData">
+            <table class="table table-striped custom-table mb-0 datatable">
+              <thead>
+                <tr>
+                  <th style="width: 30px">#</th>
+                  <th>Nom Département</th>
+                  <th>Description Département</th>
+                  <th class="text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let departement of departements; trackBy: trackByDepartement" (click)="selectDepartement(departement)">
+                  <td>{{ departement.id_departement }}</td>
+                  <td>{{ departement.nom_departement }}</td>
+                  <td>{{ departement.description }}</td>
+                  <td class="text-right">
+                    <div class="dropdown dropdown-action">
+                      <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <i class="material-icons">more_vert</i>
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#edit_departement"
+                          (click)="handleEditDepartement(departement)">
+                          <i class="fa fa-pencil m-r-5"></i> Modifier
+                        </a>
+                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#delete_departement">
+                          <i class="fa fa-trash-o m-r-5"></i> Supprimer
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <ng-template #noData>
+            <p>No data available in table</p>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Department Modal -->
+    <div class="modal custom-modal fade" [ngClass]="{ 'show': showAddModal }" id="add_departement" role="dialog">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Ajouter un département</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="showAddModal = false">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form (submit)="handleSubmit()">
+              <div class="form-group">
+                <label>Nom du département <span class="text-danger">*</span></label>
+                <input class="form-control" type="text" name="nom_departement" [(ngModel)]="formData.nom_departement"/>
+              </div>
+              <div class="form-group">
+                <label>Description du département <span class="text-danger"></span></label>
+                <input class="form-control" type="text" name="description" [(ngModel)]="formData.description"/>
+              </div>
+              <div class="submit-section">
+                <button type="submit" class="btn btn-primary submit-btn">Soumettre</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Add Department Modal -->
+
+    <!-- Edit Department Modal -->
+    <div class="modal custom-modal fade" *ngIf="selectedDepartement && showEditModal" id="edit_departement" role="dialog">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Modifier le département</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                    (click)="showEditModal = false">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form (submit)="handleUpdateDepartement()">
+              <div class="form-group">
+                <label>Nom du département<span class="text-danger">*</span></label>
+                <input class="form-control" type="text" name="nom_departement"
+                       [(ngModel)]="formData.nom_departement"/>
+              </div>
+              <div class="form-group">
+                <label>Description du département <span class="text-danger">*</span></label>
+                <input class="form-control" type="text" name="description" [(ngModel)]="formData.description"/>
+              </div>
+              <div class="submit-section">
+                <button type="submit" class="btn btn-primary submit-btn">Sauvegarder</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Edit Department Modal -->
+
+<!-- Delete Department Modal -->
+<div class="modal custom-modal fade" [ngClass]="{'show': showDeleteModal}" id="delete_departement" role="dialog">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="form-header">
+          <h3>Supprimer un département</h3>
+          <p>Etes-vous sûr de vouloir supprimer ?</p>
+        </div>
+        <div class="modal-btn delete-action">
+          <div class="row">
+            <div class="col-6">
+              <a href="/departments" class="btn btn-primary continue-btn" (click)="confirmDelete()">Supprimer</a>
+            </div>
+            <div class="col-6">
+              <a href="/departments" data-dismiss="modal" class="btn btn-primary cancel-btn" (click)="showDeleteModal=false">Annuler</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /Delete Department Modal -->
+
+
+    <!-- /Delete Department Modal -->
+  </div>
+</div>

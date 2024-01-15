@@ -1,0 +1,424 @@
+<div class="main-wrapper">
+  <app-sidebar></app-sidebar>
+  <app-navbar></app-navbar>
+
+  <div class="page-wrapper">
+
+     <!-- Page Content -->
+    <div class="content container-fluid">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col">
+            <h3 class="page-title">Gestionnaire Rh</h3>
+            <ul class="breadcrumb">
+              <li class="breadcrumb-item"><a href="/dashboard">Tableau de bord</a></li>
+              <li class="breadcrumb-item active">Gestionnairerh</li>
+            </ul>
+          </div>
+          <div class="col-auto float-right ml-auto">
+            <button class="btn add-btn" data-toggle="modal" data-target="#add_gestionnaire"><i class="fa fa-plus"></i> Ajouter un gestionnairerh</button>
+          </div>
+        </div>
+      </div>
+      <!-- /Page Header -->
+      <!-- Search Filter -->
+      <div class="row filter-row">
+        <div class="col-sm-6 col-md-3">
+          <div class="form-group form-focus">
+            <input type="text" class="form-control floating" [(ngModel)]="searchGestionnaireMATRICULE" />
+            <label class="focus-label">Matricule des gestionnaire</label>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+          <div class="form-group form-focus">
+            <input type="text" class="form-control floating" [(ngModel)]="searchGestionnaireName" />
+            <label class="focus-label">Nom du gestionnaire</label>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+          <button class="btn btn-secondary btn-block" (click)="handleResetSearch()">
+            Réinitialiser
+          </button>
+        </div>
+        <div class="col-sm-6 col-md-3">
+          <button class="btn btn-success btn-block" (click)="handleSearch()"> Rechercher </button>
+        </div>
+      </div>
+      <!-- /Search Filter -->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="table-responsive">
+          <ng-container *ngIf="gestionnaires.length > 0; else noDataTemplate">
+            <table class="table table-striped custom-table datatable">
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Matricule</th>
+                  <th>E-mail</th>
+                  <th>Mobile</th>
+                  <th>Sexe</th>
+                  <th class="text-nowrap">Anniversaire</th>
+                  <th>Rôle</th>
+                  <th class="text-right no-sort">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let gestionnaire of gestionnaires trackBy: trackByGestionnaire" (click)="selectGestionnaire(gestionnaire)">
+                  <td>
+                    <h2 class="table-avatar">
+                      <a href="profile.html" class="avatar">
+                        <img alt="" src="assets/img/profiles/avatar-02.jpg" />
+                      </a>
+                      <a href="">
+                        {{gestionnaire.nom}} {{gestionnaire.prenom}} <span>{{gestionnaire.role}}</span>
+                      </a>
+                    </h2>
+                  </td>
+                  <td>{{gestionnaire.matricule}}</td>
+                  <td>{{gestionnaire.email}}</td>
+                  <td>{{gestionnaire.numerotelephone}}</td>
+                  <td>{{gestionnaire.sexe}}</td>
+                  <td>{{gestionnaire.datenaissance}}</td>
+                  <td>
+                    <div class="dropdown">
+                      <a href="#" class="btn btn-white btn-sm btn-rounded "  aria-expanded="false">
+                        {{gestionnaire.role}}
+                      </a>
+                    </div>
+                  </td>
+                  <td class="text-right">
+                    <div class="dropdown dropdown-action">
+                      <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <i class="material-icons">more_vert</i>
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#edit_gestionnaire" (click)="handleEditGestionnaire(gestionnaire)">
+                          <i class="fa fa-pencil m-r-5"></i> Modifier
+                        </a>
+                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#delete_gestionnaire">
+                          <i class="fa fa-trash-o m-r-5"></i> Supprimer
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </ng-container>
+          <ng-template #noDataTemplate>
+            <p>Aucune donnée disponible</p>
+          </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Page Content -->
+    <!-- Add Gestionnaire Modal -->
+    <div class="modal custom-modal fade" [ngClass]="{'show': showAddModal}" id="add_gestionnaire" role="dialog">
+      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Ajouter un gestionnairerh</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form (submit)="handleSubmit($event)">
+
+                <div class="row">
+                  <div class="col-sm-6">
+                    <div class="form-group">
+                      <label class="col-form-label">Prénom<span class="text-danger">*</span></label>
+                      <input class="form-control" type="text" name="nom" [(ngModel)]="formData.nom" />
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="form-group">
+                      <label class="col-form-label">Nom de famille</label>
+                      <input class="form-control" type="text" name="prenom" [(ngModel)]="formData.prenom"  />
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="form-group">
+                      <label class="col-form-label">Nom d'utilisateur</label>
+                      <input class="form-control" type="text" name="username" [(ngModel)]="formData.username"   />
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="form-group">
+                      <label class="col-form-label">Date de naissance</label>
+                      <div class="">
+                        <input class="form-control" type="date" name="datenaissance" [(ngModel)]="formData.datenaissance"  />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="form-group">
+                      <label class="col-form-label">E-mail <span class="text-danger">*</span></label>
+                      <input class="form-control" type="email" name="email" [(ngModel)]="formData.email"   />
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="form-group">
+                      <label class="col-form-label">Mot de passe</label>
+                      <input class="form-control" type="password" name="password" [(ngModel)]="formData.password"    />
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="form-group">
+                      <label class="col-form-label">Matricule<span class="text-danger">*</span></label>
+                      <input type="text" class="form-control" name="matricule" [(ngModel)]="formData.matricule"   />
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="form-group">
+                      <label class="col-form-label">Phone </label>
+                      <input class="form-control" type="text"  name="numerotelephone" [(ngModel)]="formData.numerotelephone"  />
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="form-group">
+                      <label class="col-form-label">Ville </label>
+                      <input class="form-control" type="text" name="ville" [(ngModel)]="formData.ville"  />
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="form-group">
+                      <label class="col-form-label">Cin </label>
+                      <input class="form-control" type="text" name="cin" [(ngModel)]="formData.cin"   />
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="form-group">
+                      <label class="col-form-label">Age </label>
+                      <input class="form-control" type="text" name="age" [(ngModel)]="formData.age"   />
+                    </div>
+                  </div>
+
+                  <div class="col-sm-6">
+                    <div class="form-group">
+                      <label class="col-form-label">Sexe </label>
+                      <input class="form-control" type="text" name="sexe" [(ngModel)]="formData.sexe"  />
+                    </div>
+                  </div>
+
+                  <div class="col-sm-6">
+                    <div class="form-group">
+                      <label class="col-form-label">Total des jours alloués </label>
+                      <input class="form-control" type="text" name="totalAllocatedDays" [(ngModel)]="formData.totalAllocatedDays"  />
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="form-group">
+                      <label class="col-form-label">Rôle</label>
+                      <select name="role" class="form-control" (change)="handleRoleChange($event)">
+                        <option value="">Sélectionnez un rôle</option>
+                        <option value="gestionnairerh">Gestionnaire RH</option>
+                        <option value="employe">Employe</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Département <span class="text-danger">*</span></label>
+                      <select class="form-control" name="departement" [(ngModel)]="formData.departement">
+                        <option value="">Sélectionnez Département</option>
+                        <option *ngFor="let departement of departments" [ngValue]="departement">
+                          {{ departement.nom_departement }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Désignation <span class="text-danger">*</span></label>
+                      <select class="form-control" name="post" [(ngModel)]="formData.post">
+                        <option value="">Sélectionnez Désignation</option>
+                        <option *ngFor="let post of posts" [ngValue]="post">
+                          {{ post.nom_post }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+
+                </div>
+
+              <div class="submit-section">
+                <button class="btn btn-primary submit-btn" type="submit">Soumettre</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Add Gestionnaire Modal -->
+
+    <!-- Edit Gestionnaire Modal -->
+    <div *ngIf="selectedGestionnaire && showEditModal" id="edit_gestionnaire" class="modal custom-modal fade" role="dialog">
+      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Modifier un gestionnairerh</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form (submit)="handleUpdateGestionnaire($event)">
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label class="col-form-label">Prénom<span class="text-danger">*</span></label>
+                    <input class="form-control" type="text" name="nom" [(ngModel)]="formData.nom" />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label class="col-form-label">Nom de famille</label>
+                    <input class="form-control" type="text" name="prenom" [(ngModel)]="formData.prenom"  />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label class="col-form-label">Nom d'utilisateur</label>
+                    <input class="form-control" type="text" name="username" [(ngModel)]="formData.username"   />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label class="col-form-label">Date de naissance</label>
+                    <div class="">
+                      <input class="form-control" type="date" name="datenaissance" [(ngModel)]="formData.datenaissance"  />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label class="col-form-label">E-mail <span class="text-danger">*</span></label>
+                    <input class="form-control" type="email" name="email" [(ngModel)]="formData.email"   />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label class="col-form-label">Mot de passe</label>
+                    <input class="form-control" type="password" name="password" [(ngModel)]="formData.password"    />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label class="col-form-label">Matricule<span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="matricule" [(ngModel)]="formData.matricule"   />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label class="col-form-label">Phone </label>
+                    <input class="form-control" type="text"  name="numerotelephone" [(ngModel)]="formData.numerotelephone"  />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label class="col-form-label">Ville </label>
+                    <input class="form-control" type="text" name="ville" [(ngModel)]="formData.ville"  />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label class="col-form-label">Cin </label>
+                    <input class="form-control" type="text" name="cin" [(ngModel)]="formData.cin"   />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label class="col-form-label">Age </label>
+                    <input class="form-control" type="text" name="age" [(ngModel)]="formData.age"   />
+                  </div>
+                </div>
+
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label class="col-form-label">Sexe </label>
+                    <input class="form-control" type="text" name="sexe" [(ngModel)]="formData.sexe"  />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label class="col-form-label">Total des jours alloués </label>
+                    <input class="form-control" type="text" name="totalAllocatedDays" [(ngModel)]="formData.totalAllocatedDays"  />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label class="col-form-label">Rôle</label>
+                    <select name="role" class="form-control" (change)="handleRoleChange($event)">
+                      <option value="">Sélectionnez un rôle</option>
+                      <option value="gestionnairerh">Gestionnaire RH</option>
+                      <option value="employe">Employe</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>Département <span class="text-danger">*</span></label>
+                    <select class="form-control" name="departement" [(ngModel)]="formData.departement" >
+                      <option value="">Sélectionnez Département</option>
+                      <option *ngFor="let departement of departments" [ngValue]="departement">
+                        {{ departement.nom_departement }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>Désignation <span class="text-danger">*</span></label>
+                    <select class="form-control" name="post" [(ngModel)]="formData.post">
+                      <option value="">Sélectionnez Désignation</option>
+                      <option *ngFor="let post of posts" [ngValue]="post">
+                        {{ post.nom_post }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="submit-section">
+                <button class="btn btn-primary submit-btn" type="submit">Mettre à jour</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Edit Gestionnaire Modal -->
+
+    <!-- Delete Gestionnaire Modal -->
+    <div class="modal custom-modal fade" [ngClass]="{'show': showDeleteModal}" id="delete_gestionnaire" role="dialog">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div class="form-header">
+              <h3>Supprimer un Gestionnairerh</h3>
+              <p>Etes-vous sûr de vouloir supprimer ?</p>
+            </div>
+
+          <div class="modal-btn delete-action">
+            <div class="row">
+              <div class="col-6">
+                <a href="gestionnaires" class="btn btn-primary continue-btn" (click)="ConfirmDeleteGestionnaire()">Supprimer</a>
+              </div>
+              <div class="col-6">
+                <a href="gestionnaires" data-dismiss="modal" class="btn btn-primary cancel-btn"  (click)="showDeleteModal = false">Annuler</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Delete Gestionnaire Modal -->
+  </div>
+</div>

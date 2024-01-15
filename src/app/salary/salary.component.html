@@ -1,0 +1,219 @@
+<div class="main-wrapper">
+  <app-sidebar></app-sidebar>
+  <app-navbar></app-navbar>
+  <div class="page-wrapper">
+    <!-- Page Content -->
+    <!-- Page Content -->
+    <div class="content container-fluid">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col">
+            <h3 class="page-title">Salaire de l'employé</h3>
+            <ul class="breadcrumb">
+              <li class="breadcrumb-item"><a href="/dashboard">Tableau de bord</a></li>
+              <li class="breadcrumb-item active">Salaire</li>
+            </ul>
+          </div>
+          <div class="col-auto float-right ml-auto">
+            <button class="btn add-btn" data-toggle="modal" data-target="#add_salary"><i class="fa fa-plus"></i> Ajouter un salaire</button>
+          </div>
+        </div>
+      </div>
+      <!-- /Page Header -->
+      <!-- Search Filter -->
+      <div class="row filter-row">
+        <div class="col-sm-6 col-md-3 col-lg-3 col-xl-2 col-12">
+          <div class="form-group form-focus">
+            <input type="text" class="form-control floating" [(ngModel)]="searchEmployeeName" />
+            <label class="focus-label">Nom de l'employé</label>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-3 col-lg-3 col-xl-2 col-12">
+          <div class="form-group form-focus">
+            <input type="text" class="form-control floating" [(ngModel)]="searchEmployeeMATRICULE" />
+            <label class="focus-label">Matricule Employés</label>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-3 col-lg-3 col-xl-2 col-12">
+          <button class="btn btn-secondary btn-block" (click)="handleResetSearch()">Réinitialiser</button>
+        </div>
+        <div class="col-sm-6 col-md-3 col-lg-3 col-xl-2 col-12">
+          <button class="btn btn-success btn-block" (click)="handleSearch()">Recherche</button>
+        </div>
+      </div>
+      <!-- /Search Filter -->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="table-responsive">
+            <ng-container *ngIf="salaires.length > 0; else noData">
+              <table class="table table-striped custom-table datatable">
+                <thead>
+                  <tr>
+                    <th>Employé</th>
+                    <th>Matricule Employés</th>
+                    <th>E-mail</th>
+                    <th>Date d'adhésion</th>
+                    <th>Salaire</th>
+                    <th class="text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let salaire of salaires trackBy: trackBySalary" (click)="selectSalary(salaire)">
+                    <td>
+                      <h2 class="table-avatar">
+                        <a href="profile.html" class="avatar">
+                          <img alt="" src="assets/img/profiles/avatar-09.jpg" />
+                        </a>
+                        <a href="#">
+                          {{ salaire.employe ? salaire.employe.nom + ' ' + salaire.employe.prenom : 'Employee Not Found' }}
+                          <span *ngIf="salaire.employe && salaire.employe.post">{{ salaire.employe.post.nom_post }}</span>
+                        </a>
+                      </h2>
+                    </td>
+                    <td>{{ salaire.employe ? salaire.employe.matricule : 'EmployeeId Not Found' }}</td>
+                    <td>{{ salaire.employe ? salaire.employe.email : 'Employee Email Not Found' }}</td>
+                    <td>{{ salaire.date_joindre }}</td>
+                    <td>{{ salaire.totalSalaire }}</td>
+                    <td class="text-right">
+                      <div class="dropdown dropdown-action">
+                        <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i
+                            class="material-icons">more_vert</i></a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                          <a class="dropdown-item" href="#" data-toggle="modal" data-target="#edit_salary" (click)="handleEditSalaire(salaire)"> <i
+                              class="fa fa-pencil m-r-5"></i> Modifier </a>
+                          <a class="dropdown-item" href="#" data-toggle="modal" data-target="#delete_salary"> <i
+                              class="fa fa-trash-o m-r-5"></i> Supprimer </a>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </ng-container>
+            <ng-template #noData>
+              <p>Aucune donnée disponible</p>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Page Content -->
+
+    <!-- Add Salary Modal -->
+    <div [ngClass]="{'show': showAddModal}" class="modal custom-modal fade" role="dialog" id="add_salary" >
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Ajouter salaire du personnel</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form (submit)="handleSubmit($event)">
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label class="col-form-label">Sélectionnez le personnel</label>
+                    <select class="form-control" name="employe" [(ngModel)]="formData.employe">
+                      <option value="">Sélectionnez un employé</option>
+                      <option *ngFor="let employe of employees" [ngValue]="employe">
+                        {{ employe.username }}
+                      </option>
+                   </select>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                      <label>Salaire de base</label>
+                      <input class="form-control" type="text" name="salaireBaseMensuel" [(ngModel)]="formData.salaireBaseMensuel" />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>Nbr jours ou Base</label>
+                    <input class="form-control" type="text" name="nombreJourOuvre" [(ngModel)]="formData.nombreJourOuvre" />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>Date joindre</label>
+                    <input class="form-control" type="date" name="date_joindre" [(ngModel)]="formData.date_joindre"  />
+                  </div>
+                </div>
+              </div>
+              <div class="submit-section">
+                <button class="btn btn-primary submit-btn" type="submit">Soumettre</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Add Salary Modal -->
+
+    <!-- Edit Salary Modal -->
+    <div *ngIf="selectedSalaire && showEditModal" class="modal custom-modal fade" id="edit_salary" role="dialog">
+      <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Modifier salaire du personnel</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form (submit)="handleUpdateSalaire($event)">
+              <div class="row">
+                <div class="col-sm-6">
+                  <label>Salaire de base</label>
+                  <input class="form-control" type="text" name="salaireBaseMensuel" [(ngModel)]="formData.salaireBaseMensuel" (change)="handleInputChange($event)" />
+                </div>
+                <div class="col-sm-6">
+                  <label>Nbr jours ou Base</label>
+                  <input class="form-control" type="text" name="nombreJourOuvre" [(ngModel)]="formData.nombreJourOuvre" (change)="handleInputChange($event)" />
+                </div>
+                <div class="col-sm-6">
+                  <label>Date joindre</label>
+                  <input class="form-control" type="date" name="date_joindre" [(ngModel)]="formData.date_joindre" (change)="handleInputChange($event)" />
+                </div>
+              </div>
+              <div class="submit-section">
+                <button class="btn btn-primary submit-btn" type="submit">Soumettre</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Edit Salary Modal -->
+
+    <!-- Delete Salary Modal -->
+    <div [ngClass]="{'show': showDeleteModal}" class="modal custom-modal fade show" id="delete_salary" role="dialog">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div class="form-header">
+              <h3>Supprimer le salaire</h3>
+              <p>Etes-vous sûr de vouloir supprimer ?</p>
+            </div>
+            <div class="modal-btn delete-action">
+              <div class="row">
+                <div class="col-6">
+                  <a href="/salary" class="btn btn-primary continue-btn" (click)="ConfirmDeleteSalaire()">Supprimer</a>
+                </div>
+                <div class="col-6">
+                  <a href="/salary" data-dismiss="modal" class="btn btn-primary cancel-btn" (click)="showDeleteModal=false">Annuler</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Delete Salary Modal -->
+
+
+  </div>
+</div>

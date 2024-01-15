@@ -1,0 +1,255 @@
+<div class="main-wrapper">
+  <app-sidebar></app-sidebar>
+  <app-navbar></app-navbar>
+  <div class="page-wrapper">
+    <!-- Page Content -->
+    <div class="content container-fluid">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col">
+            <h3 class="page-title">Réclamations</h3>
+            <ul class="breadcrumb">
+              <li class="breadcrumb-item"><a href="/dashboard">Tableau de bord</a></li>
+              <li class="breadcrumb-item active">Réclamations</li>
+            </ul>
+          </div>
+          <div class="col-auto float-right ml-auto">
+            <button class="btn add-btn" data-toggle="modal" data-target="#add_reclamation"><i class="fa fa-plus"></i> Ajouter Congés</button>
+          </div>
+        </div>
+      </div>
+      <!-- /Page Header -->
+      <!-- reclamation Statistics -->
+      <div class="row">
+        <div class="col-md-3">
+          <div class="stats-info">
+            <h6>Today Réclamations</h6>
+            <h4>{{ totalReclamations }}</h4>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stats-info">
+            <h6>Réclamations résolu</h6>
+            <h4>{{ countReclamationsResolues }}</h4>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stats-info">
+            <h6>Réclamations fermé</h6>
+            <h4>{{ countReclamationsFermes }}</h4>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stats-info">
+            <h6>Réclamation en attente</h6>
+            <h4>{{ countReclamationsEnCours }}</h4>
+          </div>
+        </div>
+      </div>
+      <!-- /reclamation Statistics -->
+      <!-- Search Filter -->
+      <div class="row filter-row">
+        <div class="col-sm-6 col-md-3 col-lg-3 col-xl-2 col-12">
+          <div class="form-group form-focus">
+            <input type="text" class="form-control floating" [(ngModel)]="searchEmployeeName" />
+            <label class="focus-label">Nom de l'employé</label>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-3 col-lg-3 col-xl-2 col-12">
+          <div class="form-group form-focus select-focus">
+            <select class="form-control" [(ngModel)]="searchStatusReclamation">
+              <option value=""> Sélectionnez le Statut de réclamations</option>
+              <option value="En cours"> En cours </option>
+              <option value="Résolu"> Résolu </option>
+              <option value="Refusé"> Refusé </option>
+              <option value="Fermé"> Fermé </option>
+            </select>
+            <label class="focus-label"></label>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-3 col-lg-3 col-xl-2 col-12">
+          <button class="btn btn-success btn-block" (click)="handleSearch()"> Recherche </button>
+        </div>
+        <div class="col-sm-6 col-md-3 col-lg-3 col-xl-2 col-12">
+          <button class="btn btn-secondary btn-block" (click)="handleResetSearch()">Réinitialiser</button>
+        </div>
+      </div>
+      <!-- /Search Filter -->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="table-responsive">
+            <ng-container *ngIf="reclamations.length > 0; else noDataTemplate">
+              <table class="table table-striped custom-table mb-0 datatable">
+                <thead>
+                  <tr>
+                    <th>Employé</th>
+                    <th>Date Reclamation</th>
+                    <th>Sujet</th>
+                    <th>Description</th>
+                    <th class="text-center">Statut</th>
+                    <th class="text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let reclamation of reclamations trackBy: trackByReclamation" (click)="selectReclamation(reclamation)">
+                    <td>
+                      <h2 class="table-avatar">
+                        <a href="profile.html" class="avatar">
+                          <img alt="" src="assets/img/profiles/avatar-09.jpg" />
+                        </a>
+                        <a href="?">
+                          {{ reclamation.employe ? reclamation.employe.nom + ' ' + reclamation.employe.prenom : 'Employee Not Found' }}
+                          <span>{{ reclamation.employe && reclamation.employe.post ? reclamation.employe.post.nom_post : 'Post Not Found' }}</span>
+                        </a>
+                      </h2>
+                    </td>
+                    <td>{{ reclamation.date_reclamation }}</td>
+                    <td>{{ reclamation.sujet }}</td>
+                    <td>{{ reclamation.description }}</td>
+                    <!-- Assuming this is the part of your template -->
+                    <td class="text-center">
+                      <div class="dropdown action-label">
+                        <a [class]="getStatusClass(reclamation.status)" [href]="'#'" data-toggle="dropdown" aria-expanded="false">
+                          <i [class]="getStatusIconClass(reclamation.status)"></i> {{ reclamation.status }}
+                        </a>
+
+                        <div class="dropdown-menu dropdown-menu-right">
+                          <a class="dropdown-item" href="/reclamations" (click)="handleSolve(reclamation.id_reclamation)">
+                            <i class="fa fa-dot-circle-o text-success"></i> Résoudre
+                          </a>
+                          <a class="dropdown-item" href="/reclamations" (click)="handleDecline(reclamation.id_reclamation)">
+                            <i class="fa fa-dot-circle-o text-danger"></i> Refuser
+                          </a>
+                          <a class="dropdown-item" href="/reclamations" (click)="handleClose(reclamation.id_reclamation)">
+                            <i class="fa fa-dot-circle-o text-blue"></i> Fermer
+                          </a>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td class="text-right">
+                      <div class="dropdown dropdown-action">
+                        <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="material-icons">more_vert</i></a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                          <a class="dropdown-item" href="#" data-toggle="modal" data-target="#edit_reclamation" (click)="handleEditReclamation(reclamation)">
+                            <i class="fa fa-pencil m-r-5"></i> Modifier
+                          </a>
+                          <a class="dropdown-item" href="#" data-toggle="modal" data-target="#delete_approve">
+                            <i class="fa fa-trash-o m-r-5"></i> Supprimer
+                          </a>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </ng-container>
+            <ng-template #noDataTemplate>
+              <p>Aucune donnée disponible</p>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Page Content -->
+    <div class="modal custom-modal fade" [ngClass]="{'show': showAddModal}"  role="dialog" id="add_reclamation">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Ajouter une réclamation</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form (submit)="handleSubmit($event)" #addReclamationForm="ngForm">
+
+              <div class="form-group">
+                <label>Date Réclamation <span class="text-danger">*</span></label>
+                <div>
+                  <input class="form-control" type="date" name="date_reclamation" [(ngModel)]="formData.date_reclamation" required (change)="handleInputChange($event)" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Sujet <span class="text-danger">*</span></label>
+                <input class="form-control"  type="text" name="sujet" [(ngModel)]="formData.sujet" required (change)="handleInputChange($event)" />
+              </div>
+              <div class="form-group">
+                <label>Description<span class="text-danger">*</span></label>
+                <textarea rows="4" class="form-control" name="description" [(ngModel)]="formData.description" required (change)="handleInputChange($event)"></textarea>
+              </div>
+              <div class="submit-section">
+                <button class="btn btn-primary submit-btn" type="submit">Soumettre</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Edit Reclamation Modal -->
+    <div *ngIf="selectedReclamation && showEditModal" class="modal custom-modal fade" role="dialog" id="edit_reclamation">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Modifier le congé</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form (submit)="handleUpdateReclamation($event)">
+              <div class="form-group">
+                <label>Date Réclamation <span class="text-danger">*</span></label>
+                <div>
+                  <input class="form-control" type="date" name="date_reclamation" [(ngModel)]="formData.date_reclamation" required (change)="handleInputChange($event)" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Sujet <span class="text-danger">*</span></label>
+                <input class="form-control"  type="text" name="sujet" [(ngModel)]="formData.sujet" required (change)="handleInputChange($event)" />
+              </div>
+              <div class="form-group">
+                <label>Description<span class="text-danger">*</span></label>
+                <textarea rows="4" class="form-control" name="description" [(ngModel)]="formData.description" required (change)="handleInputChange($event)"></textarea>
+              </div>
+              <div class="submit-section">
+                <button class="btn btn-primary submit-btn" type="submit">Soumettre</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Edit reclamation Modal -->
+
+
+    <!-- Delete reclamation Modal -->
+    <div [ngClass]="{'show': showDeleteModal}"  class="modal custom-modal fade show" id="delete_approve" role="dialog">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div class="form-header">
+              <h3>Supprimer une réclamation</h3>
+              <p>Etes-vous sûr de vouloir supprimer ce réclamation ?</p>
+            </div>
+            <div class="modal-btn delete-action">
+              <div class="row">
+                <div class="col-6">
+                  <a href="reclamations" class="btn btn-primary continue-btn" (click)="ConfirmDeleteReclamation()">Supprimer</a>
+                </div>
+                <div class="col-6">
+                  <a href="reclamations" data-dismiss="modal" class="btn btn-primary cancel-btn" (click)="showDeleteModal=false">Annuler</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Delete reclamation Modal -->
+
+  </div>
+</div>

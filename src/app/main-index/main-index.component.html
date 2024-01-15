@@ -1,0 +1,100 @@
+<!-- main-index.component.html -->
+<div class="main-wrapper">
+  <app-sidebar></app-sidebar>
+  <div class="page-wrapper">
+    <app-navbar></app-navbar>
+    <div class="content container-fluid">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="row">
+          <div class="col-sm-12">
+            <h3 class="page-title">Bienvenue Gestionnaire Rh!</h3>
+            <ul class="breadcrumb">
+              <li class="breadcrumb-item active">Dashboard</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- /Page Header -->
+      <!-- Dashboard Cards and Content -->
+      <div class="row">
+        <!-- Add your dashboard cards here -->
+        <div class="col-md-6 col-sm-6 col-lg-6 col-xl-3">
+          <div class="card dash-widget">
+            <div class="card-body">
+              <span class="dash-widget-icon"><i class="fa fa-cubes"></i></span>
+              <div class="dash-widget-info">
+                <h3>{{ departmentsCount }}</h3>
+                <span>Departments</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-sm-6 col-lg-6 col-xl-3">
+          <div class="card dash-widget">
+            <div class="card-body">
+              <span class="dash-widget-icon"><i class="fa fa-globe"></i></span>
+              <div class="dash-widget-info">
+                <h3>{{vacancesCount}}</h3>
+                <span>Vacances</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-sm-6 col-lg-6 col-xl-3">
+          <div class="card dash-widget">
+            <div class="card-body">
+              <span class="dash-widget-icon"><i class="fa fa-diamond"></i></span>
+              <div class="dash-widget-info">
+                <h3>{{ postsCount }}</h3>
+                <span>Posts</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-sm-6 col-lg-6 col-xl-3">
+          <div class="card dash-widget">
+            <div class="card-body">
+              <span class="dash-widget-icon"><i class="fa fa-user"></i></span>
+              <div class="dash-widget-info">
+                <h3>{{ employeesCount }}</h3>
+                <span>Employees</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Repeat for other dashboard cards -->
+      </div>
+      <!-- /Dashboard Cards and Content -->
+
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card-group m-b-30">
+            <div class="card" *ngFor="let count of [congesCount, reclamationsCount, reposCount, demissionsCount]">
+              <div class="card-body">
+                <div class="d-flex justify-content-between mb-3">
+                  <div>
+                    <span class="d-block" *ngIf="count === congesCount">Nouveau demande de congés</span>
+                    <span class="d-block" *ngIf="count === reclamationsCount">Reclamation</span>
+                    <span class="d-block" *ngIf="count === reposCount">Repos</span>
+                    <span class="d-block" *ngIf="count === demissionsCount">Resignation</span>
+
+                  </div>
+                </div>
+                <h3 class="mb-3">{{ count }}</h3>
+                <div class="progress" style="height: 5px;">
+                  <div class="progress-bar bg-primary" role="progressbar" [style.width]="(count / 100) * 100 + '%'"
+                    [attr.aria-valuenow]="count" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

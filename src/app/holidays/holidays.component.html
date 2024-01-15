@@ -1,0 +1,180 @@
+<div class="main-wrapper">
+  <app-sidebar></app-sidebar>
+  <div class="page-wrapper">
+    <app-navbar></app-navbar>
+
+    <!-- Page Content -->
+    <div class="content container-fluid">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col">
+            <h3 class="page-title">Vacances</h3>
+            <ul class="breadcrumb">
+              <li class="breadcrumb-item"><a href="/dashboard">Tableau de bord</a></li>
+              <li class="breadcrumb-item active">Vacances</li>
+            </ul>
+          </div>
+          <div class="col-auto float-right ml-auto">
+            <a href="#" class="btn add-btn" data-toggle="modal" data-target="#add_vacance" (click)="showAddModal = true">
+              <i class="fa fa-plus"></i> Ajouter Vacances
+            </a>
+          </div>
+        </div>
+      </div>
+      <!-- /Page Header -->
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="table-responsive">
+            <ng-container *ngIf="vacances.length > 0; else noData">
+              <table class="table table-striped custom-table mb-0">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Nom vacance </th>
+                    <th>Date Debut Vacance</th>
+                    <th>Date Fin Vacance</th>
+                    <th>Nbr Jour Vacance</th>
+                    <th class="text-right no-sort">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let vacance of vacances; trackBy: trackByVacance" class="vacance-upcoming">
+                    <td>{{ vacance.id_vacance }}</td>
+                    <td>{{ vacance.nom_vacance }}</td>
+                    <td>{{ vacance.datedebut_vacance }}</td>
+                    <td>{{ vacance.datefin_vacance }}</td>
+                    <td>{{ vacance.nbrjour_vacance }}</td>
+                    <td class="text-right">
+                      <div class="dropdown dropdown-action">
+                        <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                          <i class="material-icons">more_vert</i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                          <a class="dropdown-item" href="#" data-toggle="modal" data-target="#edit_vacance"
+                             (click)="handleEditVacance(vacance)">
+                            <i class="fa fa-pencil m-r-5"></i> Modifier
+                          </a>
+                          <a class="dropdown-item" href="#" data-toggle="modal" data-target="#delete_vacance"
+                             (click)="handleDeleteVacance()">
+                            <i class="fa fa-trash-o m-r-5"></i> Supprimer
+                          </a>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </ng-container>
+            <ng-template #noData>
+              <p>Aucune donnée disponible</p>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Page Content -->
+
+    <!-- Add Holiday Modal -->
+    <div class="modal custom-modal fade" [ngClass]="{'show': showAddModal}" id="add_vacance" role="dialog">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Ajouter Vacances</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="showAddModal = false">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form (submit)="handleSubmit()">
+              <div class="form-group">
+                <label>Nom Vacance <span class="text-danger">*</span></label>
+                <input class="form-control" type="text" name="nom_vacance" [(ngModel)]="formData.nom_vacance" />
+              </div>
+              <div class="form-group">
+                <label>Début des vacances <span class="text-danger">*</span></label>
+                <div class=""><input class="form-control" type="date" name="datedebut_vacance" [(ngModel)]="formData.datedebut_vacance" /></div>
+              </div>
+              <div class="form-group">
+                <label>Fin des vacances <span class="text-danger">*</span></label>
+                <div class=""><input class="form-control" type="date" name="datefin_vacance" [(ngModel)]="formData.datefin_vacance" /></div>
+              </div>
+              <div class="form-group">
+                <label>Jours <span class="text-danger">*</span></label>
+                <input class="form-control" type="text" name="nbrjour_vacance" [(ngModel)]="formData.nbrjour_vacance" />
+              </div>
+              <div class="submit-section">
+                <button class="btn btn-primary submit-btn" type="submit">Soumettre</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Add Holiday Modal -->
+
+    <!-- Edit Holiday Modal -->
+    <div *ngIf="selectedVacance && showEditModal" id="edit_vacance" class="modal custom-modal fade" role="dialog">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Modifier Vacances</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="showEditModal = false">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form (submit)="handleUpdateVacance()">
+              <div class="form-group">
+                <label>Nom Vacance <span class="text-danger">*</span></label>
+                <input class="form-control" type="text" name="nom_vacance" [(ngModel)]="formData.nom_vacance" />
+              </div>
+              <div class="form-group">
+                <label>Début des vacances <span class="text-danger">*</span></label>
+                <div class=""><input class="form-control" type="date" name="datedebut_vacance" [(ngModel)]="formData.datedebut_vacance" /></div>
+              </div>
+              <div class="form-group">
+                <label>Fin des vacances <span class="text-danger">*</span></label>
+                <div class=""><input class="form-control" type="date" name="datefin_vacance" [(ngModel)]="formData.datefin_vacance" /></div>
+              </div>
+              <div class="form-group">
+                <label>Jours <span class="text-danger">*</span></label>
+                <input class="form-control" type="text" name="nbrjour_vacance" [(ngModel)]="formData.nbrjour_vacance" />
+              </div>
+              <div class="submit-section">
+                <button class="btn btn-primary submit-btn" type="submit">Soumettre</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Edit Holiday Modal -->
+
+    <!-- Delete Holiday Modal -->
+    <div class="modal custom-modal fade" [ngClass]="{'show': showDeleteModal}" id="delete_vacance" role="dialog">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div class="form-header">
+              <h3>Supprimer Vacances</h3>
+              <p>Etes-vous sûr de vouloir supprimer ?</p>
+            </div>
+            <div class="modal-btn delete-action">
+              <div class="row">
+                <div class="col-6">
+                  <a href="#" class="btn btn-primary continue-btn" (click)="handleDeleteVacance()">Supprimer</a>
+                </div>
+                <div class="col-6">
+                  <a href="#" class="btn btn-primary cancel-btn" data-dismiss="modal" (click)="showDeleteModal = false">Annuler</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Delete Holiday Modal -->
+  </div>
+</div>
